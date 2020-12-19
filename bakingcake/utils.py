@@ -36,6 +36,29 @@ def collect_company_index():
     return symbols
 
 
+def get_advanced_info(ticker_list):
+    """
+        This method will get advanced info provided a ticket list.
+
+    Args:
+        ticker_list (list): list of tickers
+
+    Returns:
+        advanced information DataFrame
+    """
+    advanced_info_df = pd.DataFrame()
+    cols = ["ticker", "marketcap", "peRatio", "priceToSales"]
+    # Iterate over each ticker and add information to the DataFrame
+    for ticker in ticker_list:
+        stock_instance = Stock(ticker)
+        adv_stats = stock_instance.get_advanced_stats()
+        adv_stats["ticker"] = ticker
+        advanced_info_df = advanced_info_df.append(
+            adv_stats.loc[:, cols], ignore_index=True)
+
+    return advanced_info_df
+
+
 def get_price_action(
         ticker_list,
         start=datetime.datetime.today() - datetime.timedelta(days=31),
