@@ -112,10 +112,18 @@ def get_volatility(price_action_df):
     # Add overall low and high prices
     vol_df = vol_df.join(low, on="ticker").join(high, on="ticker")
     # Add latest close as current price
+    start = pd.Timestamp(price_action_df["date"].min())
     end = pd.Timestamp(price_action_df["date"].max())
+    vol_df["start"] = start
+    vol_df["end"] = end
+    opening_prices = price_action_df.loc[ 
+        price_action_df["date"] == start, ["ticker", "open"]]
     closing_prices = price_action_df.loc[
-        price_action_df["date"] == end, ["ticker", "close"]] 
+        price_action_df["date"] == end, ["ticker", "close"]]
+    vol_df = vol_df.join(opening_prices.set_index("ticker"), on=["ticker"]) 
     vol_df = vol_df.join(closing_prices.set_index("ticker"), on=["ticker"])
+    # Calculate overall return
+    vol_df["return"] = (vol_df["close"] - vol_df["open"]) / vol_df["open"]
     # Drop count and reset index
     vol_df = vol_df.drop("count", axis=1).reset_index()
 
