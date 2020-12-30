@@ -1,14 +1,14 @@
 Asset,Ticker,Allocation (%)
 Tesla,TSLA,58.5
 Bitcoin,BTC,16.5
-Cash,,11.5
+Cash,$,11.5
 Palantir,PLTR,3.5
 Peloton,PTON,1.5
 Square,SQ,1.4
 Apple,AAPL,1.3
 Spotify,SPOT,1.2
 Nike,NKE,1.1
-Ethereum,ETC,0.9
+Ethereum,ETH,0.9
 Facebook,FB,0.9
 Slack,WORK,0.8
 Adidas,ADDYY,0.6
