@@ -47,14 +47,15 @@ def get_advanced_info(ticker_list):
         advanced information DataFrame
     """
     advanced_info_df = pd.DataFrame()
-    cols = ["ticker", "marketcap", "peRatio", "priceToSales"]
     # Iterate over each ticker and add information to the DataFrame
     for ticker in ticker_list:
         stock_instance = Stock(ticker)
         adv_stats = stock_instance.get_advanced_stats()
+        # Coerce object columns to numeric
+        adv_stats = adv_stats.apply(pd.to_numeric, errors='coerce') 
         adv_stats["ticker"] = ticker
         advanced_info_df = advanced_info_df.append(
-            adv_stats.loc[:, cols], ignore_index=True)
+            adv_stats, ignore_index=True)
 
     return advanced_info_df
 

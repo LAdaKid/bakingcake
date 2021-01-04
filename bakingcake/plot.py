@@ -31,3 +31,35 @@ def plot_risk_reward(vol_df):
     ax.set_ylabel("Reward (Overall Return in %)")
 
     return fig
+
+
+def plot_kpi_heatmap(adv_info, kpis, ascending=[]):
+    """
+        Plot a comparison heatmap of normalized key performance indicators.
+
+        Args:
+            adv_info (pandas.DataFrame): advanced stock information
+            kpis (list): list of kpis
+            ascending (list): list of boolean values dictating order
+
+        Returns
+            kpi comparison heatmap 
+    """
+    fig, ax = plt.subplots(1, 1)
+    # Get kpis and normalize
+    kpi_df = adv_info.loc[:, kpis]
+    normalized_df = (kpi_df - kpi_df.min()) / (kpi_df.max() - kpi_df.min())
+    # Add tickers
+    normalized_df["ticker"] = adv_info["ticker"]
+    # Flip columns where the values are ascending
+    if len(ascending) == len(kpis):
+        ascending_cols = [kpis[i] for i in range(len(kpis)) if ascending[i]]
+        normalized_df.loc[
+            :, ascending_cols] = 1.0 - normalized_df.loc[:, ascending_cols]
+    # Plot on axis
+    ax = sns.heatmap(
+        normalized_df.set_index("ticker").T, cmap="RdYlGn", linewidths=.5)
+    # Set title
+    ax.set_title("KPI Comparison Heatmap")
+
+    return fig
