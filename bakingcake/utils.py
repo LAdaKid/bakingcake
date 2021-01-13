@@ -129,3 +129,69 @@ def get_volatility(price_action_df):
     vol_df = vol_df.drop("count", axis=1).reset_index()
 
     return vol_df
+
+
+def calculate_delta(df, kpi, period="annual"):
+    """
+        This method will calculate the growth rate given a financial statement
+        and a key performance indicator.
+
+        Args:
+            df (pandas.DataFrame): financial statement
+            kpi (str): key performance indicator
+
+        Returns:
+            growth rate
+    """
+    latest = 0
+    if period == "annual":
+        previous = 1
+    elif period == "quarterly":
+        previous = 4
+    growth_rate = (
+        (df.iloc[latest][kpi] - df.iloc[previous][kpi]) /
+        df.iloc[previous][kpi]) * 100.0
+
+    return growth_rate
+
+
+def generate_delta_df(ticker_list):
+    """
+        This method will collect YoY and QoQ delta metrics.
+
+        Args:
+            ticker_list (list): list of tickers
+
+        Returns:
+            delta DataFrame
+    """
+    delta_df = pd.DataFrame()
+    for ticker in ticker_list:
+        stock_instance = Stock(ticker)
+        # Grab last 2 annual income statements
+        ann_inc = stock_instance.get_income_statement(
+            period="annual", last=2)
+        qt_inc = stock_instance.get_income_statement(
+            period="quarterly", last=5)
+        row = pd.DataFrame({
+            "ticker": [ticker],
+            "yoy_rev_delta": [calculate_delta(ann_inc, "totalRevenue")],
+            "yoy_opex_delta": [calculate_delta(ann_inc, "operatingExpense")],
+            "yoy_ni_delta": [calculate_delta(ann_inc, "netIncome")],
+            "yoy_cor_delta": [calculate_delta(ann_inc, "costOfRevenue")],
+            "yoy_sgna_delta": [calculate_delta(
+                ann_inc, "sellingGeneralAndAdmin")],
+            "qoq_rev_delta": [calculate_delta(
+                qt_inc, "totalRevenue", period="quarterly")],
+            "qoq_opex_delta": [calculate_delta(
+                qt_inc, "operatingExpense", period="quarterly")],
+            "qoq_ni_delta": [calculate_delta(
+                qt_inc, "netIncome", period="quarterly")],
+            "qoq_cor_delta": [calculate_delta(
+                qt_inc, "costOfRevenue", period="quarterly")],
+            "qoq_sgna_delta": [calculate_delta(
+                qt_inc, "sellingGeneralAndAdmin", period="quarterly")]})
+        # Append row to delta df 
+        delta_df = delta_df.append(row, ignore_index=True)
+
+    return delta_df
