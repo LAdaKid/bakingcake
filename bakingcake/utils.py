@@ -167,6 +167,7 @@ def generate_delta_df(ticker_list):
     """
     delta_df = pd.DataFrame()
     for ticker in ticker_list:
+        print(ticker)
         stock_instance = Stock(ticker)
         # Grab last 2 annual income statements
         ann_inc = stock_instance.get_income_statement(
