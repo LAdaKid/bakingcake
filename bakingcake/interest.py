@@ -4,12 +4,7 @@ This module will house the interest calculation engine of baking cake.
 import yaml
 import numpy as np
 import pandas as pd
-from pycoingecko import CoinGeckoAPI
-
-# Initialize
-CG_API = CoinGeckoAPI()
-# Get the coin list
-COIN_LIST = CG_API.get_coins_list()
+from . import holdings
 
 
 def load_holdings(input_path):
@@ -22,104 +17,31 @@ def load_holdings(input_path):
     Returns:
         analysis of holdings
     """
-    holdings = yaml.safe_load(open("bakingcake/holdings/tokens.yaml", "r"))
+    holdings_list = []
+    holdings_dict = yaml.safe_load(open(input_path, "r"))
     # Iterate over holdings and get id and prices
-    for i in range(len(holdings["holdings"])):
-        token_info, success = get_token_info(holdings["holdings"][i]["ticker"])
-        holdings["holdings"][i]["id"] = token_info["id"]
-        holdings["holdings"][i]["price"] = CG_API.get_price(
-            ids=holdings["holdings"][i]["id"], vs_currencies='usd'
-        )[holdings["holdings"][i]["id"]]["usd"]
-        # Calculate the total holdings in USD
-        holdings["holdings"][i]["total"] = (
-            holdings["holdings"][i]["price"] *
-            holdings["holdings"][i]["quantity"])
-        # Calculate the 1 year yield
-        holdings["holdings"][i]["1_year_yield_usd"] = (
-            holdings["holdings"][i]["total"] *
-            (holdings["holdings"][i]["apy"] / 100.0))
-        holdings["holdings"][i]["1_year_yield_token"] = (
-            holdings["holdings"][i]["quantity"] *
-            (holdings["holdings"][i]["apy"] / 100.0))
+    #for i in range(len(holdings_dict["holdings"])):
+    for holding in holdings_dict["holdings"]:
+        holdings_list.append(
+            holdings.HoldingSchema().load(holding))
 
-    return holdings
+    return holdings_list
 
 
-def calculate_portfolio_yield(holdings):
+def calculate_portfolio_yield(holdings_list):
     """
         This method will calculate the overall yield of the portfolio.
 
         Args:
-            holdings (dict): portfolio holdings
+            holdings_list (list): list of portfolio holdings
 
         Returns:
             portfolio yield
     """
     portfolio_yield = {}
     portfolio_yield["one_year_yield"] = sum(
-        [i["1_year_yield_usd"] for i in holdings["holdings"]])
+        [h.annual_yield_usd for h in holdings_list])
     portfolio_yield["one_day_yield"] = (
         portfolio_yield["one_year_yield"] / 365.0)
 
     return portfolio_yield
-
-
-def get_token_info(ticker):
-    """
-    Get the information provided a token's ticker.
-
-    Args:
-        ticker (str): ticker symbol as a string
-
-    Return:
-        ticker information
-    """
-    success = False
-    token_info = {}
-    token_list = [i for i in COIN_LIST if ticker.lower() == i["symbol"]]
-    if token_list:
-        success = True
-        if len(token_list) == 1:
-            token_info = token_list[0]
-        else:
-            i = 0
-            while True:
-                token_info = token_list[i]
-                if (
-                    "governance" not in token_info["id"] and
-                    "-" in token_info["id"]
-                ):
-                    i += 1
-                else:
-                    break
-
-    return token_info, success
-
-
-def calculate_apy(apr, n=365):
-    """
-        This method will calculate apy given apr and n.
-
-        Args:
-            apr (float): Annual percentage rate
-            n (int_float): number of compounding periods per year
-
-        Returns:
-            Annual percentage yield
-    """
-
-    return np.power((1 + (apr / n)), n) - 1
-
-def calculate_apr(apy, n=365):
-    """
-        This method will calculate apr given apy and n.
-
-        Args:
-            apy (float): annual percentage yield
-            n (int|float): number of compounding periods per year
-
-        Returns:
-            Annual percentage rate
-    """
-
-    return n * (np.power(apy + 1, 1 / n) - 1)

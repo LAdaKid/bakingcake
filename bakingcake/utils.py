@@ -1,4 +1,5 @@
 import datetime
+import numpy as np
 import pandas as pd
 from iexfinance.stocks import Stock
 from iexfinance.refdata import get_symbols
@@ -196,3 +197,33 @@ def generate_delta_df(ticker_list):
         delta_df = delta_df.append(row, ignore_index=True)
 
     return delta_df
+
+
+def calculate_apy(apr, n=365):
+    """
+        This method will calculate apy given apr and n.
+
+        Args:
+            apr (float): Annual percentage rate
+            n (int_float): number of compounding periods per year
+
+        Returns:
+            Annual percentage yield
+    """
+
+    return np.power((1 + (apr / n)), n) - 1
+
+
+def calculate_apr(apy, n=365):
+    """
+        This method will calculate apr given apy and n.
+
+        Args:
+            apy (float): annual percentage yield
+            n (int|float): number of compounding periods per year
+
+        Returns:
+            Annual percentage rate
+    """
+
+    return n * (np.power(apy + 1, 1 / n) - 1)
