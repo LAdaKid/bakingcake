@@ -2,6 +2,7 @@
 This module will house the interest calculation engine of baking cake.
 """
 import yaml
+import numpy as np
 import pandas as pd
 from pycoingecko import CoinGeckoAPI
 
@@ -93,3 +94,32 @@ def get_token_info(ticker):
                     break
 
     return token_info, success
+
+
+def calculate_apy(apr, n=365):
+    """
+        This method will calculate apy given apr and n.
+
+        Args:
+            apr (float): Annual percentage rate
+            n (int_float): number of compounding periods per year
+
+        Returns:
+            Annual percentage yield
+    """
+
+    return np.power((1 + (apr / n)), n) - 1
+
+def calculate_apr(apy, n=365):
+    """
+        This method will calculate apr given apy and n.
+
+        Args:
+            apy (float): annual percentage yield
+            n (int|float): number of compounding periods per year
+
+        Returns:
+            Annual percentage rate
+    """
+
+    return n * (np.power(apy + 1, 1 / n) - 1)
