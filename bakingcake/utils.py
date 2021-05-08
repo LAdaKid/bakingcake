@@ -1,4 +1,5 @@
 import datetime
+import yaml
 import numpy as np
 import pandas as pd
 from iexfinance.stocks import Stock
@@ -210,7 +211,6 @@ def calculate_apy(apr, n=365):
         Returns:
             Annual percentage yield
     """
-
     return np.power((1 + (apr / n)), n) - 1
 
 
@@ -225,5 +225,4 @@ def calculate_apr(apy, n=365):
         Returns:
             Annual percentage rate
     """
-
     return n * (np.power(apy + 1, 1 / n) - 1)

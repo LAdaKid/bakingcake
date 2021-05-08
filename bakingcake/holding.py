@@ -56,3 +56,16 @@ class Holding(object):
         self.annual_yield_token = self.quantity * self.apy
 
         return
+
+
+def load_holdings(holdings_list):
+    """
+    This method will load the users holdings based on an input filepath.
+
+    Args:
+        holdings_list (list): list of holdings information
+
+    Returns:
+        list of holdings objects
+    """
+    return [HoldingSchema().load(h) for h in holdings_list]
