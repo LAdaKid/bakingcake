@@ -1,5 +1,5 @@
 from marshmallow import Schema, fields, post_load, validates, ValidationError
-from . import utils, crypto
+from . import utils, crypto, equity
 
 
 class HoldingSchema(Schema):
@@ -9,6 +9,7 @@ class HoldingSchema(Schema):
     name = fields.String(required=True)
     ticker = fields.String(required=True)
     quantity = fields.Float(required=True)
+    asset_type = fields.String(required=True)
     apr = fields.Float()
     apy = fields.Float()
 
@@ -16,13 +17,22 @@ class HoldingSchema(Schema):
     def create_holding(self, input_data, **kwargs):
         return Holding(**input_data)
 
+    @validates("asset_type")
+    def validate_quantity(self, asset_type):
+        asset_types = ("crypto", "equity")
+        if asset_type not in asset_types:
+            raise ValidationError(
+                "Invalid asset type provided, please select one of the"
+                " following: {}.".format(", ".join(asset_types)))
+
 
 class Holding(object):
     """
         This class will function as the base object class for a portfolio.
     """
 
-    def __init__(self, name, ticker, quantity, apr=None, apy=None):
+    def __init__(
+            self, name, ticker, quantity, asset_type, apr=None, apy=None):
         """
             Holding constructor.
         """
@@ -42,13 +52,21 @@ class Holding(object):
         self.apy = apy
         # TODO: Add list of different base currencies
         self.base_currency = "usd"
-        # Ger holding info
-        token_info, success = crypto.get_token_info(ticker)
-        self.id = token_info["id"]
-        # Calculate price
-        self.price = crypto.CG_API.get_price(
-            ids=self.id, vs_currencies=self.base_currency
-        )[self.id][self.base_currency]
+        # Get price provided asset type
+        self.asset_type = asset_type
+        if asset_type == "crypto":
+            # Get holding info
+            token_info, success = crypto.get_token_info(ticker)
+            self.id = token_info["id"]
+            # Calculate price
+            self.price = crypto.CG_API.get_price(
+                ids=self.id, vs_currencies=self.base_currency
+            )[self.id][self.base_currency]
+        elif asset_type == "equity":
+            self.stock = equity.Stock(ticker)
+            self.quote = self.stock.get_quote()
+            self.id = self.quote["companyName"][0]
+            self.price = self.quote["latestPrice"][0]
         # Calculate the holding total
         self.total = self.price * self.quantity
         # Calculate the annual yield

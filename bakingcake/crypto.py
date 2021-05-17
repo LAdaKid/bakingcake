@@ -1,5 +1,5 @@
 """
-	Store general crypto api interations in this module.
+    Store general crypto api interations in this module.
 """
 from pycoingecko import CoinGeckoAPI
 
@@ -10,13 +10,13 @@ COIN_LIST = CG_API.get_coins_list()
 
 def get_token_info(ticker):
     """
-    Get the information provided a token's ticker.
+        Get the information provided a token's ticker.
 
-    Args:
-        ticker (str): ticker symbol as a string
+        Args:
+            ticker (str): ticker symbol as a string
 
-    Return:
-        ticker information
+        Return:
+            ticker information
     """
     success = False
     token_info = {}
