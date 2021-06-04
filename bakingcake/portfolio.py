@@ -28,6 +28,13 @@ class Portfolio(object):
         # Get portfolio metrics
         self.portfolio_total = sum([h.total for h in self.holdings])
         self.portfolio_yeild = calculate_portfolio_yield(self.holdings)
+        # TODO: Add sums per asset
+
+        # TODO: Add sums per asset class
+
+        # TODO: Add USD
+
+        # TODO: Add assets earning interest
 
         return
 
@@ -44,13 +51,6 @@ def load_portfolio(input_path):
             portfolio object
     """
     portfolio_args = yaml.safe_load(open(input_path, "r"))
-    """
-    portfolio_obj = None
-    try:
-        portfolio_obj = PortfolioSchema().load(portfolio_args)
-    except ValidationError as e:
-        print(e)
-    """
     portfolio_obj = PortfolioSchema().load(portfolio_args)
 
     return portfolio_obj
