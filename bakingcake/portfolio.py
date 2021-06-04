@@ -28,8 +28,8 @@ class Portfolio(object):
         # Get portfolio metrics
         self.portfolio_total = sum([h.total for h in self.holdings])
         self.portfolio_yeild = calculate_portfolio_yield(self.holdings)
-        # TODO: Add sums per asset
-
+        # Calculate sums per asset
+        self.assets = add_assets(self.holdings)
         # TODO: Add sums per asset class
 
         # TODO: Add USD
@@ -54,6 +54,37 @@ def load_portfolio(input_path):
     portfolio_obj = PortfolioSchema().load(portfolio_args)
 
     return portfolio_obj
+
+
+def add_assets(holdings):
+    """
+        Add sums per asset and return asset dict.
+
+        TODO: Switch to asset pandas DataFrame
+
+        Args:
+            holdings (list): list of portfolio holdings
+
+        Returns:
+            asset dict
+    """
+    assets = {}
+    for h in holdings:
+        asset_str = h.asset_type + "-" + h.ticker
+        if asset_str not in assets:
+            assets[asset_str] = {
+                "quantity": h.quantity,
+                "price": h.price,
+                "total": h.total}
+        else:
+            assets[asset_str][
+                "quantity"] += h.quantity
+            assets[asset_str][
+                "price"] += h.price
+            assets[asset_str][
+                "total"] += h.total
+
+    return assets
 
 
 def calculate_portfolio_yield(holdings_list):
