@@ -1,5 +1,6 @@
 import yaml
 from marshmallow import Schema, fields, post_load, validates, ValidationError
+import pandas as pd
 from . import holding
 
 
@@ -25,11 +26,12 @@ class Portfolio(object):
             Portfolio constructor.
         """
         self.holdings = holdings
-        # Get portfolio metrics
-        self.portfolio_total = sum([h.total for h in self.holdings])
-        self.portfolio_yeild = calculate_portfolio_yield(self.holdings)
         # Calculate sums per asset
-        self.assets = add_assets(self.holdings)
+        self.assets_df, self.portfolio_total = \
+            get_asset_df_and_total(self.holdings)
+        # Get portfolio metrics
+        self.portfolio_yeild = calculate_portfolio_yield(self.holdings)
+
         # TODO: Add sums per asset class
 
         # TODO: Add USD
@@ -56,7 +58,7 @@ def load_portfolio(input_path):
     return portfolio_obj
 
 
-def add_assets(holdings):
+def get_asset_df_and_total(holdings):
     """
         Add sums per asset and return asset dict.
 
@@ -73,9 +75,12 @@ def add_assets(holdings):
         asset_str = h.asset_type + "-" + h.ticker
         if asset_str not in assets:
             assets[asset_str] = {
+                "asset_type": h.asset_type,
+                "ticker": h.ticker,
                 "quantity": h.quantity,
                 "price": h.price,
-                "total": h.total}
+                "total": h.total,
+                "annual_yield_usd": h.annual_yield_usd}
         else:
             assets[asset_str][
                 "quantity"] += h.quantity
@@ -83,8 +88,19 @@ def add_assets(holdings):
                 "price"] += h.price
             assets[asset_str][
                 "total"] += h.total
+            assets[asset_str][
+                "annual_yield_usd"] += h.annual_yield_usd
+    # Cast dict to DataFrame
+    assets_df = pd.DataFrame(assets).T.reset_index()
+    # Calculate total
+    total = assets_df.total.sum()
+    # Calculate percentages
+    assets_df["allocation_percentage"] = assets_df.total / total
+    # Sort by allocation percentage and reset index
+    assets_df = assets_df.sort_values(
+        by="allocation_percentage", ascending=False).reset_index(drop=True)
 
-    return assets
+    return assets_df, total
 
 
 def calculate_portfolio_yield(holdings_list):
