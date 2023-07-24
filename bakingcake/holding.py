@@ -1,5 +1,6 @@
+from iexfinance.stocks import Stock
 from marshmallow import Schema, fields, post_load, validates, ValidationError
-from . import utils, crypto, equity
+from . import utils
 
 
 class HoldingSchema(Schema):
@@ -19,7 +20,7 @@ class HoldingSchema(Schema):
 
     @validates("asset_type")
     def validate_quantity(self, asset_type):
-        asset_types = ("crypto", "equity")
+        asset_types = ("crypto", "equity", "cash")
         if asset_type not in asset_types:
             raise ValidationError(
                 "Invalid asset type provided, please select one of the"
@@ -56,17 +57,20 @@ class Holding(object):
         self.asset_type = asset_type
         if asset_type == "crypto":
             # Get holding info
-            token_info, success = crypto.get_token_info(ticker)
+            token_info, success = utils.get_token_info(ticker)
             self.id = token_info["id"]
             # Calculate price
-            self.price = crypto.CG_API.get_price(
+            self.price = utils.CG_API.get_price(
                 ids=self.id, vs_currencies=self.base_currency
             )[self.id][self.base_currency]
         elif asset_type == "equity":
-            self.stock = equity.Stock(ticker)
+            self.stock = Stock(ticker)
             self.quote = self.stock.get_quote()
             self.id = self.quote["companyName"][0]
             self.price = self.quote["latestPrice"][0]
+        elif asset_type == "cash":
+            self.id = "USD"
+            self.price = 1.0
         # Calculate the holding total
         self.total = self.price * self.quantity
         # Calculate the annual yield

@@ -1,0 +1,49 @@
+# TODO: Setup ability to separate accounts
+# TODO: Add ability to include cash positions
+
+holdings:
+  
+  - name: Apple
+    ticker: AAPL
+    quantity: 30
+    asset_type: equity
+
+  - name: Amazon
+    ticker: AMZN
+    quantity: 50
+    asset_type: equity
+
+  - name: Facebook
+    ticker: META
+    quantity: 28
+    asset_type: equity
+
+  - name: Nike
+    ticker: NKE
+    quantity: 60
+    asset_type: equity
+
+  - name: Nvidia
+    ticker: NVDA
+    quantity: 5
+    asset_type: equity
+
+  - name: Nasdaq
+    ticker: QQQ
+    quantity: 5
+    asset_type: equity
+
+  - name: Tesla
+    ticker: TSLA
+    quantity: 12
+    asset_type: equity
+
+  - name: S&P500
+    ticker: VOO
+    quantity: 35
+    asset_type: equity
+
+  - name: Dollars
+    ticker: USD
+    quantity: 34357
+    asset_type: cash

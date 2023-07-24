@@ -27,8 +27,8 @@ class Portfolio(object):
         """
         self.holdings = holdings
         # Calculate sums per asset
-        self.assets_df, self.portfolio_total = \
-            get_asset_df_and_total(self.holdings)
+        self.assets_df, self.portfolio_total = get_asset_df_and_total(
+            self.holdings)
         # Get portfolio metrics
         self.portfolio_yeild = calculate_portfolio_yield(self.holdings)
 
