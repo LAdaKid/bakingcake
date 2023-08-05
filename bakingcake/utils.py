@@ -86,7 +86,7 @@ def get_price_action(
             volatility DataFrame
     """
     cols = ["ticker", "open", "close", "low", "high", "changePercent"]
-    price_action_df = pd.DataFrame()
+    price_action_list = []
     # Iterate over each ticker and add information to the DataFrame
     for ticker in ticker_list:
         df = get_historical_data(ticker, start, end)
@@ -96,11 +96,25 @@ def get_price_action(
         # Cast values to floating point numbers
         for column in cols[1:]:
             df[column] = df[column].astype(float)
-        price_action_df = price_action_df.append(
-            df.loc[:, cols].reset_index(),
-            ignore_index=True)
+        # Append DataFrame to list
+        price_action_list.append(df.loc[:, cols])
 
-    return price_action_df
+    return pd.concat(price_action_list).reset_index()
+
+
+def get_price_history_matrix(price_action_df):
+    """
+        This method will pivot long price data to a price history matrix.
+
+        Args:
+            price_action_df (pandas.DataFrame):
+
+        Returns:
+            price history matrix
+    """
+    return price_action_df.pivot(
+        index="date", columns="ticker", values="close"
+    ).reset_index().set_index("date")
 
 
 def get_volatility(price_action_df):
