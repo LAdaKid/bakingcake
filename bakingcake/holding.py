@@ -7,7 +7,7 @@ class HoldingSchema(Schema):
     """
         Schema for specifying the holding characteristics.
     """
-    name = fields.String(required=True)
+    account = fields.String(required=True)
     ticker = fields.String(required=True)
     quantity = fields.Float(required=True)
     asset_type = fields.String(required=True)
@@ -33,12 +33,12 @@ class Holding(object):
     """
 
     def __init__(
-            self, name, ticker, quantity, asset_type, apr=None, apy=None):
+            self, account, ticker, quantity, asset_type, apr=None, apy=None):
         """
             Holding constructor.
         """
         # Setup required args
-        self.name = name
+        self.account = account
         self.ticker = ticker
         self.quantity = quantity
         # Setup annual percentage rate and yield

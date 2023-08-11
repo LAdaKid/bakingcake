@@ -1,3 +1,4 @@
+import os
 import yaml
 from marshmallow import Schema, fields, post_load, validates, ValidationError
 import pandas as pd
@@ -52,10 +53,20 @@ def load_portfolio(input_path):
         Returns:
             portfolio object
     """
-    portfolio_args = yaml.safe_load(open(input_path, "r"))
-    portfolio_obj = PortfolioSchema().load(portfolio_args)
+    # Pull file extension
+    filename, extension = os.path.splitext(input_path)
+    # Parse YAML portfolio file
+    if extension in (".yaml", "yml"):
+        portfolio_args = yaml.safe_load(open(input_path, "r"))
+    elif extension == ".csv":
+        portfolio_args = {
+            "holdings": pd.read_csv(input_path).to_dict("records")}
+    else:
+        # TODO: Add error handling here
+        pass
 
-    return portfolio_obj
+
+    return PortfolioSchema().load(portfolio_args)
 
 
 def get_asset_df_and_total(holdings):
@@ -82,14 +93,10 @@ def get_asset_df_and_total(holdings):
                 "total": h.total,
                 "annual_yield_usd": h.annual_yield_usd}
         else:
-            assets[asset_str][
-                "quantity"] += h.quantity
-            assets[asset_str][
-                "price"] += h.price
-            assets[asset_str][
-                "total"] += h.total
-            assets[asset_str][
-                "annual_yield_usd"] += h.annual_yield_usd
+            assets[asset_str]["quantity"] += h.quantity
+            assets[asset_str]["price"] += h.price
+            assets[asset_str]["total"] += h.total
+            assets[asset_str]["annual_yield_usd"] += h.annual_yield_usd
     # Cast dict to DataFrame
     assets_df = pd.DataFrame(assets).T.reset_index()
     # Calculate total

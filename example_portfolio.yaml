@@ -3,47 +3,47 @@
 
 holdings:
   
-  - name: Apple
+  - account: etrade
     ticker: AAPL
     quantity: 30
     asset_type: equity
 
-  - name: Amazon
+  - account: etrade
     ticker: AMZN
     quantity: 50
     asset_type: equity
 
-  - name: Facebook
+  - account: etrade
     ticker: META
     quantity: 28
     asset_type: equity
 
-  - name: Nike
+  - account: etrade
     ticker: NKE
     quantity: 60
     asset_type: equity
 
-  - name: Nvidia
+  - account: etrade
     ticker: NVDA
     quantity: 5
     asset_type: equity
 
-  - name: Nasdaq
+  - account: etrade
     ticker: QQQ
     quantity: 5
     asset_type: equity
 
-  - name: Tesla
+  - account: etrade
     ticker: TSLA
     quantity: 12
     asset_type: equity
 
-  - name: S&P500
+  - account: etrade
     ticker: VOO
     quantity: 35
     asset_type: equity
 
-  - name: Dollars
+  - account: etrade
     ticker: USD
     quantity: 34357
     asset_type: cash

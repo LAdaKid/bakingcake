@@ -130,3 +130,7 @@ dmypy.json
 
 # PI
 /bakingcake/holdings
+
+# Apple file
+*.numbers
+.DS_Store
