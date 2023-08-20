@@ -28,8 +28,9 @@ class Portfolio(object):
         """
         self.holdings = holdings
         # Calculate sums per asset
-        self.assets_df, self.portfolio_total = get_asset_df_and_total(
-            self.holdings)
+        self.assets_df = get_asset_summary_df(self.holdings)
+        # Calculate total
+        self.portfolio_total = self.assets_df.total.sum()
         # Get portfolio metrics
         self.portfolio_yeild = calculate_portfolio_yield(self.holdings)
 
@@ -69,17 +70,15 @@ def load_portfolio(input_path):
     return PortfolioSchema().load(portfolio_args)
 
 
-def get_asset_df_and_total(holdings):
+def get_asset_summary_df(holdings):
     """
-        Add sums per asset and return asset dict.
+    This function will combine everything into one summary DataFrame.
 
-        TODO: Switch to asset pandas DataFrame
+    Args:
+        holdings (list): list of portfolio holdings
 
-        Args:
-            holdings (list): list of portfolio holdings
-
-        Returns:
-            asset dict
+    Returns:
+        Asset Summary DataFrame
     """
     assets = {}
     for h in holdings:
@@ -94,20 +93,18 @@ def get_asset_df_and_total(holdings):
                 "annual_yield_usd": h.annual_yield_usd}
         else:
             assets[asset_str]["quantity"] += h.quantity
-            assets[asset_str]["price"] += h.price
             assets[asset_str]["total"] += h.total
             assets[asset_str]["annual_yield_usd"] += h.annual_yield_usd
     # Cast dict to DataFrame
     assets_df = pd.DataFrame(assets).T.reset_index()
-    # Calculate total
-    total = assets_df.total.sum()
     # Calculate percentages
-    assets_df["allocation_percentage"] = assets_df.total / total
+    assets_df["allocation_percentage"] = assets_df["total"].apply(
+        lambda x: round((x / assets_df.total.sum()) * 100.0, 2))
     # Sort by allocation percentage and reset index
     assets_df = assets_df.sort_values(
         by="allocation_percentage", ascending=False).reset_index(drop=True)
 
-    return assets_df, total
+    return assets_df
 
 
 def calculate_portfolio_yield(holdings_list):

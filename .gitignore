@@ -129,8 +129,11 @@ dmypy.json
 .pyre/
 
 # PI
-/bakingcake/holdings
+holdings/
 
 # Apple file
 *.numbers
 .DS_Store
+
+# Jupyter Notebooks
+*.ipynb

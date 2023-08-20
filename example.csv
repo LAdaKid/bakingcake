@@ -1,6 +1,0 @@
-account,ticker,quantity,asset_type
-coinbase,ETH,10,crypto
-coinbase,BTC,1,crypto
-etrade,NKE,50,equity
-etrade,AAPL,20,equity
-etrade,META,10,equity
