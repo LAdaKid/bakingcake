@@ -47,7 +47,7 @@ def collect_company_index():
 
 def get_advanced_info(ticker_list):
     """
-        This method will get advanced info provided a ticket list.
+    This method will get advanced info provided a ticket list.
 
     Args:
         ticker_list (list): list of tickers
@@ -67,39 +67,6 @@ def get_advanced_info(ticker_list):
             adv_stats, ignore_index=True)
 
     return advanced_info_df
-
-
-def get_price_action(
-        ticker_list,
-        start=datetime.datetime.today() - datetime.timedelta(days=31),
-        end=datetime.datetime.today() - datetime.timedelta(days=1)):
-    """
-        This method will pull the stock price volatility given a list of
-        tickers and a start and end date.
-
-        Args:
-            ticker_list (list): list of tickers
-            start (datetime.datetime): start date
-            end (datetime.datetime): end date
-
-        Returns:
-            volatility DataFrame
-    """
-    cols = ["ticker", "open", "close", "low", "high", "changePercent"]
-    price_action_list = []
-    # Iterate over each ticker and add information to the DataFrame
-    for ticker in ticker_list:
-        df = get_historical_data(ticker, start, end)
-        df["ticker"] = ticker
-        # Set name of index to date
-        df.index = df.index.set_names(['date'])
-        # Cast values to floating point numbers
-        for column in cols[1:]:
-            df[column] = df[column].astype(float)
-        # Append DataFrame to list
-        price_action_list.append(df.loc[:, cols])
-
-    return pd.concat(price_action_list).reset_index()
 
 
 def get_price_history_matrix(price_action_df):

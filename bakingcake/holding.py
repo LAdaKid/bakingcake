@@ -1,6 +1,6 @@
 from iexfinance.stocks import Stock
 from marshmallow import Schema, fields, post_load, validates, ValidationError
-from . import utils
+from . import utils, stocks
 
 
 class HoldingSchema(Schema):
@@ -41,6 +41,7 @@ class Holding(object):
         self.account = account
         self.ticker = ticker
         self.quantity = quantity
+        self.asset_type = asset_type
         # Setup annual percentage rate and yield
         if apr and not apy:
             apy = utils.calculate_apy(apr)
@@ -77,6 +78,17 @@ class Holding(object):
         self.annual_yield_usd = self.total * self.apy
         self.annual_yield_token = self.quantity * self.apy
 
+        return
+
+
+    def get_price_action(self, **kwargs):
+        """
+        This method will act as a wrapper around the stock and crypto price
+        action functions.
+        """
+        if self.asset_type == "equity":
+            return stocks.get_price_action([self.ticker], **kwargs)
+        # TODO: Place crypto logic here
         return
 
 
