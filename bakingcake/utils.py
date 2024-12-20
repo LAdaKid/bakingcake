@@ -2,9 +2,6 @@ import datetime
 import yaml
 import numpy as np
 import pandas as pd
-from iexfinance.stocks import Stock
-from iexfinance.refdata import get_symbols
-from iexfinance.stocks import get_historical_data
 from pycoingecko import CoinGeckoAPI
 
 
